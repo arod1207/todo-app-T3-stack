@@ -1,11 +1,36 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
+import { MouseEventHandler, useState } from "react";
+import { FormEvent } from "react";
 
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const task = api.todos.getAll.useQuery();
+
+  const utils = api.useContext();
+  const mutation = api.todos.addTask.useMutation({
+    onSuccess() {
+      utils.todos.getAll.invalidate();
+    },
+  });
+
+  const mutationDelete = api.todos.deleteTask.useMutation({
+    onSuccess() {
+      utils.todos.getAll.invalidate();
+    },
+  });
+
+  const [text, setText] = useState("");
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutation.mutate(text);
+  };
+
+  const handleDelete = (id: string) => {
+    mutationDelete.mutate(id);
+  };
 
   return (
     <>
@@ -18,15 +43,34 @@ const Home: NextPage = () => {
         <div>
           <h1 className="text-3xl font-bold text-white">Todo</h1>
         </div>
-        <form className="space-x-2">
+        <form className="space-x-2" onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Enter a todo"
             className="rounded-md p-2"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
           <button className="rounded-md bg-teal-400 p-2">Submit</button>
         </form>
         {/* //todo list//  */}
+        <div className="flex flex-col gap-5 bg-black py-2">
+          {task.data
+            ? task.data.map((t) => (
+                <div className="flex gap-3">
+                  <h3 className="text-white" key={t.id}>
+                    {t.text}
+                  </h3>
+                  <button
+                    className="rounded-md bg-red-600 p-1 text-white"
+                    onClick={() => handleDelete(t.id)}
+                  >
+                    Delete Task
+                  </button>
+                </div>
+              ))
+            : "Add a todo"}
+        </div>
       </main>
     </>
   );
