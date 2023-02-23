@@ -27,4 +27,22 @@ export const todoRouter = createTRPCRouter({
       });
       return deleted;
     }),
+  toggleTask: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        isComplete: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const toggled = await ctx.prisma.todo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          isComplete: input.isComplete,
+        },
+      });
+      return toggled;
+    }),
 });
