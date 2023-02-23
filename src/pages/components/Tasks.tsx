@@ -27,7 +27,9 @@ const Task = () => {
           <div className="flex justify-between gap-3" key={t.id}>
             <h3
               className={`${
-                t.isComplete ? "text-red-600 line-through" : "text-white"
+                t.isComplete
+                  ? "text-xl text-red-600 line-through"
+                  : "text-xl text-white"
               }`}
             >
               {t.text}
