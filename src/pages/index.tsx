@@ -5,35 +5,23 @@ import { FormEvent } from "react";
 import Task from "./components/Tasks";
 
 import { api } from "~/utils/api";
-
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 const Home: NextPage = () => {
   const utils = api.useContext();
   const { mutate: addTaskMutation } = api.todos.addTask.useMutation({
+    onError(error) {
+      const message = JSON.parse(error.message);
+      toast.error(message[0].message);
+    },
     onSuccess() {
       utils.todos.getAll.invalidate();
+      toast.success("Todo Added");
       setText("");
-      notify();
     },
   });
 
   const [text, setText] = useState("");
-
-  const notify = () =>
-    toast("Task Added", {
-      duration: 2000,
-      position: "top-center",
-
-      // Custom Icon
-      icon: "✅",
-
-      // Change colors of success/error/loading icon
-      iconTheme: {
-        primary: "#000",
-        secondary: "#fff",
-      },
-    });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,8 +37,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex h-screen flex-col items-center justify-center bg-black">
         <div>
-          <Toaster />
-          <h1 className="text-3xl font-bold text-white">Todo</h1>
+          <h1 className="text-4xl font-bold text-teal-500">Another Todo App</h1>
         </div>
         <form className="space-x-2 py-6" onSubmit={handleSubmit}>
           <input

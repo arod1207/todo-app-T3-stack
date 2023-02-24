@@ -7,8 +7,9 @@ export const todoRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.todo.findMany();
   }),
+
   addTask: publicProcedure
-    .input(z.string({ required_error: "Cannot be empty" }).min(1).max(40))
+    .input(z.string().min(1).max(40))
     .mutation(async ({ ctx, input }) => {
       const task = await ctx.prisma.todo.create({
         data: {
@@ -17,6 +18,7 @@ export const todoRouter = createTRPCRouter({
       });
       return task;
     }),
+
   deleteTask: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -27,6 +29,7 @@ export const todoRouter = createTRPCRouter({
       });
       return deleted;
     }),
+
   toggleTask: publicProcedure
     .input(
       z.object({
